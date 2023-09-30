@@ -13,12 +13,10 @@ import org.springframework.security.web.SecurityFilterChain;
 
 import javax.sql.DataSource;
 
-import static org.springframework.security.config.http.MatcherType.mvc;
-
 @Configuration
 public class BankConfiguration {
 
-@Autowired
+    @Autowired
     private DataSource dataSource;
 
     @Value("${bank.queries.users-query}")
