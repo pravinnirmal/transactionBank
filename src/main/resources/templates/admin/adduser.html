@@ -7,16 +7,6 @@
 <body>
 
 <h3 align="centre">Register User</h3>
-<form action="" th:action="@{/admin/adduser}" method="post" th:object="${AddUserEntity}">
-    <label>User name:</label>
 
-    <input type="text" th:field="*{username}" />
-    <br>
-    <label>Password :</label>
-    <input th:field="*{password}" type="password"/>
-    <br>
-    <input type="submit">
-    <input type="reset">
-</form>
 </body>
 </html>
