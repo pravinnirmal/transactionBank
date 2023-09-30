@@ -15,7 +15,7 @@ public class BankController {
     }
 
     @GetMapping ("admin/dashboard")
-    public String viewDashboard(){
+    public String viewAdminDashboard(){
         return "admin/dashboard";
     }
 
@@ -25,7 +25,8 @@ public class BankController {
     }
 
     @GetMapping("admin/adduser")
-    public String addUserToDb(){
+    public String addUserToDb(Model model){
+        model.addAttribute("AddUserEntity", new AddUserEntity());
         return "admin/adduser";
     }
 
