@@ -7,6 +7,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+import pnd.pravin.bank.BankEntitites.AddUserAuthority;
 import pnd.pravin.bank.BankEntitites.AddUserEntity;
 import pnd.pravin.bank.Bankservices.BankService;
 
@@ -39,7 +40,8 @@ public class BankController {
     @PostMapping("admin/adduser")
     public String addUserToDb(@ModelAttribute("AddUserEntity") AddUserEntity addUserEntity, Model model){
         model.addAttribute("AddUserEntity", new AddUserEntity());
-        bankService.addUserToDatabase(addUserEntity);
+        AddUserAuthority addUserAuthority = new AddUserAuthority();
+        bankService.addUserToDatabase(addUserEntity, addUserAuthority);
         return "/admin/registrationsuccess";
     }
 
