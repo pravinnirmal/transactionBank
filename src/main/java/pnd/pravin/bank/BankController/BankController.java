@@ -1,15 +1,17 @@
-package pnd.pravin.bank.controller;
+package pnd.pravin.bank.BankController;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import pnd.pravin.bank.BankEntitites.AddUserAuthority;
 import pnd.pravin.bank.BankEntitites.AddUserEntity;
-import pnd.pravin.bank.Bankservices.BankService;
+import pnd.pravin.bank.BankEntitites.PersonalAccountEntity;
+import pnd.pravin.bank.BankServices.BankService;
 
 @Controller
 public class BankController {
@@ -27,7 +29,14 @@ public class BankController {
     }
 
     @GetMapping ("user/dashboard")
-    public String viewUserDashboard(){
+    public String viewUserDashboard(@ModelAttribute("PersonalAccountEntity") PersonalAccountEntity personalAccountEntity, Model model){
+//        bankService.getAccountDetails();
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String UserName =authentication.getName();
+        double money = bankService.getAccountDetails(UserName);
+
+        model.addAttribute("money", money);
+
         return "user/dashboard";
     }
 

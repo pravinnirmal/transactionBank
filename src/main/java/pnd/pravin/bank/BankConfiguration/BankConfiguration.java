@@ -1,4 +1,4 @@
-package pnd.pravin.bank.configuration;
+package pnd.pravin.bank.BankConfiguration;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
