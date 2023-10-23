@@ -22,6 +22,9 @@ public class BankController {
     @Autowired
     SendMoneyService sendMoneyService;
 
+    Authentication authentication;
+
+
     @GetMapping("/")
     public String homePage() {
         return "index";
@@ -34,12 +37,12 @@ public class BankController {
 
     @GetMapping("user/dashboard")
     public String viewUserDashboard(@ModelAttribute("PersonalAccountEntity") PersonalAccountEntity personalAccountEntity, Model model) {
-//        bankService.getAccountDetails();
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        authentication = SecurityContextHolder.getContext().getAuthentication();
         String UserName = authentication.getName();
         double money = bankService.getAccountDetails(UserName);
 
         model.addAttribute("money", money);
+        model.addAttribute("username", UserName);
 
         return "user/dashboard";
     }
@@ -67,7 +70,8 @@ public class BankController {
     @PostMapping("user/dashboard/moneytransfer/sendmoney")
     public String sendMoneyToUser(@ModelAttribute("SendMoney") SendMoneyEntity sendMoneyEntity, Model model, RedirectAttributes redirectAttributes) {
         model.addAttribute("SendMoney", new SendMoneyEntity());
-        String transferStatus = sendMoneyService.sendMoneyToUser(sendMoneyEntity);
+        String transferee = authentication.getName();
+        String transferStatus = sendMoneyService.sendMoneyToUser(sendMoneyEntity, transferee );
         model.addAttribute("transferStatus", transferStatus);
         return  "user/dashboard/moneytransfer/transferstatus";
     }

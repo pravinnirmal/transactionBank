@@ -5,8 +5,9 @@
     <title>Dashboard</title>
 </head>
 <body>
-<H1 align="center"> Welcome to Bank of Pravin <span th:text="*{username}"></span> </H1>
-<h2> Account Balance: ₹ <span th:text ="*{money}"> </span> </h2>
+<H1 align="center"> Bank of Pravin </H1>
+<h2> Welcome <span th:text="*{username}"></span> </h2>
+<h3> Account Balance: ₹ <span th:text ="*{money}"> </span> </h3>
 <p>
  <a href="/user/dashboard/moneytransfer/sendmoney">Money Transfer</a>
 </p>
