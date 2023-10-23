@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.w3.org/1999/html">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Send Money</title>
+</head>
+<body>
+<h3 align="centre">Send Money</h3>
+<form id = "transferForm" action="" th:action="@{/user/dashboard/moneytransfer/sendmoney}" method="post" th:object ="${SendMoney}">
+    <label>User name:</label>
+
+    <input type="text" th:field="*{userName}"  id="userName"/>
+    <br>
+    <label>Money to Send :</label>
+    <input th:field="*{money}" type="number" id="money"/>
+    <br>
+    <input type="submit">
+    <input type="reset">
+</form>
+
+<p>  <a href="/logout">Logout</a> </p>
+</body>
+</html>

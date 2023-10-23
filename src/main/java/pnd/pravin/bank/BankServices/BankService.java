@@ -24,7 +24,8 @@ PersonalAccountRepository personalAccountRepository;
         BCryptPasswordEncoder encoder = new BCryptPasswordEncoder(5);
         addUserEntity.setPassword(encoder.encode(addUserEntity.getPassword()));
 
-        addUserEntity.setEnabled(1);addUserAuthority.setUsername(addUserEntity.getUsername());
+        addUserEntity.setEnabled(1);
+        addUserAuthority.setUsername(addUserEntity.getUsername());
         addUserAuthority.setRole("ROLE_USER");
         addUserRepository.save(addUserEntity);
         addUserAuthorityRepository.save(addUserAuthority);
