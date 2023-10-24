@@ -1,6 +1,7 @@
 package pnd.pravin.bank.BankServices;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
@@ -15,14 +16,38 @@ public class SendMoneyService {
     PersonalAccountRepository personalAccountRepository;
 
 
+    @Value("${money.transfer.failed.sameUser}")
+    private String transferFailedSameUser;
+
+    @Value("${money.transfer.failed.no-sufficient-balance}")
+    private String transferFailedNoSufficientBalance;
+
+    @Value("${money.transfer.failed.user-not-found}")
+    private String transferFailedUserNotFound;
+
+    @Value("${money.transfer.failed.transfer-success}")
+    private String transferSuccess;
+
     public String sendMoneyToUser(SendMoneyEntity sendMoneyEntity, String transferee) {
 
+        //Check if user name is present in DB
         if (personalAccountRepository.findById(sendMoneyEntity.getUserName()).isPresent()) {
-            addMoneyToUser(sendMoneyEntity.getMoney(), sendMoneyEntity.getUserName(), transferee);
+            PersonalAccountEntity account = personalAccountRepository.findById(sendMoneyEntity.getUserName()).get();
+            String transfererName = account.getUsername();
+            Double transfererBalance = account.getMoney();
+            // Check if transferer name and transferee name are same
+            if (transferee.equals(transfererName)) {
+                return transferFailedSameUser;
+                // Check if transferer account balance is sufficient
+            } else if (transfererBalance < sendMoneyEntity.getMoney()) {
+                return transferFailedNoSufficientBalance;
+            } else {
+                addMoneyToUser(sendMoneyEntity.getMoney(), sendMoneyEntity.getUserName(), transferee);
+            }
         } else {
-            return "Transfer Failed. Reason: User not found";
+            return transferFailedUserNotFound;
         }
-        return "Transfer Success";
+        return transferSuccess;
     }
 
     private void addMoneyToUser(Double moneyToSend, String userName, String transferee) {
