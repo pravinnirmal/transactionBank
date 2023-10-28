@@ -27,6 +27,7 @@ public class BankController {
 
     @GetMapping("/")
     public String homePage() {
+        authentication = SecurityContextHolder.getContext().getAuthentication();
         return "index";
     }
 
@@ -37,7 +38,7 @@ public class BankController {
 
     @GetMapping("user/dashboard")
     public String viewUserDashboard(@ModelAttribute("PersonalAccountEntity") PersonalAccountEntity personalAccountEntity, Model model) {
-        authentication = SecurityContextHolder.getContext().getAuthentication();
+
         String UserName = authentication.getName();
         double money = bankService.getAccountDetails(UserName);
 

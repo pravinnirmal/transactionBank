@@ -18,6 +18,7 @@ public class SendMoneyEntity {
     private String userName;
     private Double money;
 
+
     PersonalAccountRepository personalAccountRepository;
 
     @Autowired
