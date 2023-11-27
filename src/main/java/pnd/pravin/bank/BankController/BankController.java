@@ -7,12 +7,15 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
-import pnd.pravin.bank.BankEntitites.AddUserAuthority;
-import pnd.pravin.bank.BankEntitites.AddUserEntity;
-import pnd.pravin.bank.BankEntitites.PersonalAccountEntity;
+import pnd.pravin.bank.BankEntitites.*;
+import pnd.pravin.bank.BankRepositories.TransactionStatementRepository;
 import pnd.pravin.bank.BankServices.BankService;
-import pnd.pravin.bank.BankEntitites.SendMoneyEntity;
 import pnd.pravin.bank.BankServices.SendMoneyService;
+import pnd.pravin.bank.BankServices.TransactionStatementRepositoryService;
+
+import java.util.AbstractList;
+import java.util.ArrayList;
+import java.util.List;
 
 @Controller
 public class BankController {
@@ -22,7 +25,14 @@ public class BankController {
     @Autowired
     SendMoneyService sendMoneyService;
 
+//    @Autowired
+//    TransactionStatementRepository transactionStatementRepository;
+
+    @Autowired
+    TransactionStatementRepositoryService transactionStatementRepositoryService;
+
     Authentication authentication;
+    String loggedInUser;
 
 
     @GetMapping("/")
@@ -39,11 +49,11 @@ public class BankController {
     @GetMapping("user/dashboard")
     public String viewUserDashboard(@ModelAttribute("PersonalAccountEntity") PersonalAccountEntity personalAccountEntity, Model model) {
 
-        String UserName = authentication.getName();
-        double money = bankService.getAccountDetails(UserName);
+        loggedInUser = authentication.getName();
+        double money = bankService.getAccountDetails(loggedInUser);
 
         model.addAttribute("money", money);
-        model.addAttribute("username", UserName);
+        model.addAttribute("username", loggedInUser);
 
         return "user/dashboard";
     }
@@ -71,10 +81,20 @@ public class BankController {
     @PostMapping("user/dashboard/moneytransfer/sendmoney")
     public String sendMoneyToUser(@ModelAttribute("SendMoney") SendMoneyEntity sendMoneyEntity, Model model, RedirectAttributes redirectAttributes) {
         model.addAttribute("SendMoney", new SendMoneyEntity());
-        String transferee = authentication.getName();
-        String transferStatus = sendMoneyService.sendMoneyToUser(sendMoneyEntity, transferee );
+//        String transferee = authentication.getName();
+        String transferStatus = sendMoneyService.sendMoneyToUser(sendMoneyEntity, loggedInUser );
         model.addAttribute("transferStatus", transferStatus);
         return  "user/dashboard/moneytransfer/transferstatus";
+    }
+
+    @GetMapping ("user/dashboard/statement")
+    public String userStatement(@ModelAttribute("TransactionStatement") TransactionStatement transactionStatement, Model model) {
+        String userId = loggedInUser;
+        List<TransactionStatement> userStatements = new ArrayList<>();
+        userStatements = transactionStatementRepositoryService.getStatementsByUserName(userId);
+        model.addAttribute("userStatements", userStatements);
+
+        return  "user/dashboard/statement/statement";
     }
 
 

@@ -3,9 +3,11 @@ package pnd.pravin.bank.BankServices;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import pnd.pravin.bank.BankEntitites.PersonalAccountEntity;
 import pnd.pravin.bank.BankEntitites.SendMoneyEntity;
 import pnd.pravin.bank.BankEntitites.TransactionStatement;
+import pnd.pravin.bank.BankEntitites.TransactionStatementEmbeddedId;
 import pnd.pravin.bank.BankRepositories.PersonalAccountRepository;
 import pnd.pravin.bank.BankRepositories.TransactionStatementRepository;
 
@@ -73,51 +75,62 @@ public class SendMoneyService {
         balanceMoney -= moneySent;
         account.setMoney(balanceMoney);
         personalAccountRepository.save(account);
-        saveToSecondPersonTransactions(userName, moneySent, transferedTo);
+        saveToSecondPersonTransactions(userName, moneySent, transferedTo, balanceMoney);
     }
+    @Transactional
+    public void saveToSecondPersonTransactions(String userName, Double moneySent, String transferedTo, Double balanceMoney) {
+        Queue<TransactionStatement> statementQueue = new ArrayDeque<>();
 
-//    public List <TransactionStatement> getTransactionStatementbyList(String userId){
-//        return transactionStatementRepository.findIdByList(userId);
-//
-//    }
+        // Fetch the existing transaction statements for the user
+        List<TransactionStatement> existingStatements = transactionStatementRepository.findByTransactionStatementEmbeddedIdUserName(userName);
 
-    private void saveToSecondPersonTransactions(String userName, Double moneySent, String transferedTo) {
-//        Optional<TransactionStatement> statement = Optional.ofNullable(transactionStatementRepository.findAllById(Collections.singleton(userName)).iterator().next());
-//        TransactionStatement statement1 = transactionStatementRepository.findAllById(Collections.singleton(userName)).iterator().next();
-
-        Queue <TransactionStatement> statementQueue = new ArrayDeque<>();
-//        Queue <List <TransactionStatement>> statementQueue = new ArrayDeque<>();
-    if(transactionStatementRepository.findAllById(Collections.singleton(userName)).iterator().hasNext()) {
-        statementQueue.add(transactionStatementRepository.findAllById(Collections.singleton(userName)).iterator().next());
-//        statementQueue.add(getTransactionStatementbyList(userName));
-    }
-        TransactionStatement statement1 = transactionStatementRepository.findById(userName).get();
+        statementQueue.addAll(existingStatements);
 
         if (statementQueue.size() > 4) {
-            System.out.println(statementQueue.size());
+            // Remove the oldest statement
             statementQueue.poll();
-            statementQueue.add(saveToStatementRepo(userName, moneySent, transferedTo, statement1));
-            System.out.println(transactionStatementRepository.count());
-
-
-        } else {
-            addNewTransactionToUser(userName, moneySent, transferedTo, statement1);
-
         }
 
+        TransactionStatement newTransactionStatement = createNewTransactionStatement(userName, moneySent, transferedTo, balanceMoney);
+        statementQueue.add(newTransactionStatement);
+
+        // Update the database with the modified statements
+        updateTransactionStatements(userName, statementQueue);
     }
 
-    private void addNewTransactionToUser(String userName, Double moneySent, String transferedTo, TransactionStatement statement1) {
-        TransactionStatement statement = new TransactionStatement(
-                userName,
-                transferedTo,
-                moneySent+statement1.getBalance(),
-                moneySent,
-                Timestamp.from(Instant.now()),
-                "Credit",
-                generateTransactionId(userName));
+    private TransactionStatement createNewTransactionStatement(String userName, Double moneySent, String transferedTo, Double balanceMoney) {
+        // Create a new TransactionStatement with the relevant details
+        TransactionStatement newTransactionStatement = new TransactionStatement();
+        TransactionStatementEmbeddedId newEmbeddedId = new TransactionStatementEmbeddedId(generateTransactionId(userName), transferedTo);
+        PersonalAccountEntity personalAccountEntity = personalAccountRepository.findById(userName).get();
+        newTransactionStatement.setTransactionStatementEmbeddedId(newEmbeddedId);
+        newTransactionStatement.setAmount(moneySent);
+        newTransactionStatement.setBalance(balanceMoney);
+        newTransactionStatement.setTransferFrom(userName);
+        newTransactionStatement.setTimestamp(Timestamp.from(Instant.now()));
+        newTransactionStatement.setCreditDebit("Debit");
 
-        transactionStatementRepository.save(statement);
+
+        return newTransactionStatement;
+    }
+
+    private void updateTransactionStatements(String userName, Queue<TransactionStatement> statementQueue) {
+        // Update the database with the modified transaction statements
+        List<TransactionStatement> updatedStatements = new ArrayList<>(statementQueue);
+        transactionStatementRepository.saveAll(updatedStatements);
+    }
+
+
+       private void addNewTransactionToUser(String userName, Double moneySent, String transferedTo, TransactionStatement statement1) {
+        statement1.setTransactionStatementEmbeddedId(new TransactionStatementEmbeddedId(userName, generateTransactionId(userName)));
+        statement1.setAmount(moneySent);
+        statement1.setBalance(moneySent + statement1.getBalance());
+        statement1.setTransferFrom(transferedTo);
+        statement1.setTimestamp(Timestamp.from(Instant.now()));
+        statement1.setCreditDebit("Credit");
+
+
+        transactionStatementRepository.save(statement1);
 
     }
 
@@ -127,17 +140,17 @@ public class SendMoneyService {
         statement1.setCreditDebit("Credit");
         statement1.setTimestamp(Timestamp.from(Instant.now()));
         statement1.setTransferFrom(transferedTo);
-        statement1.setUserName(userName);
-        statement1.setTransactionId(generateTransactionId(userName));
+        statement1.setTransactionStatementEmbeddedId(new TransactionStatementEmbeddedId(userName, generateTransactionId(userName)));
         transactionStatementRepository.save(statement1);
         return statement1;
     }
 
     private String generateTransactionId(String userName) {
         Random random = new Random();
-        return userName.substring(0,3) +random.nextInt(999999);
+        return userName.substring(0, 3) + random.nextInt(999999);
     }
 }
+
 
 
 

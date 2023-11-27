@@ -7,6 +7,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.sql.Timestamp;
+
 @Getter
 @Setter
 @NoArgsConstructor
@@ -15,11 +16,8 @@ import java.sql.Timestamp;
 @Table(name = "transactional_statement")
 public class TransactionStatement {
 
-//    @EmbeddedId
-//    private TransactionStatementEmbedded transactionStatementEmbedded;
-
-    @Column(name = "user_id")
-    private String userName;
+    @EmbeddedId
+    private TransactionStatementEmbeddedId transactionStatementEmbeddedId;
     @Column(name = "transfer_from")
     private String transferFrom;
     @Column(name = "balance")
@@ -30,7 +28,5 @@ public class TransactionStatement {
     private Timestamp timestamp;
     @Column(name = "credit_debit")
     private String creditDebit;
-    @Id
-    @Column(name = "transaction_id")
-    private String transactionId;
+
 }

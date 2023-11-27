@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Bank Statement</title>
+</head>
+<body>
+
+<h2>Last Month Statement History</h2>
+<p> Below is the last month transfer history</p>
+
+<table>
+    <thead>
+    <tr>
+        <th> Transaction Id </th>
+        <th> Money Sent </th>
+        <th> Credit / Debit</th>
+        <th> Transferred To </th>
+
+        <th> Balance </th>
+    </tr>
+    </thead>
+    <tbody>
+<!--    <tr th:if="${transactionStatement.null}">-->
+<!--        <td colspan="2"> No Books Available </td>-->
+<!--    </tr>-->
+    <tr th:each="statement : ${userStatements}">
+        <td><span th:text="${statement.transactionStatementEmbeddedId.transactionId}"> Transaction Id </span></td>
+        <td><span th:text="${statement.amount}"> Money Sent </span></td>
+        <td><span th:text="${statement.creditDebit}"> Credit / Debit </span></td>
+        <td><span th:text="${statement.transactionStatementEmbeddedId.userName}"> Transferred To </span></td>
+
+        <td><span th:text="${statement.balance}"> Balance </span></td>
+    </tr>
+    </tbody>
+</table>
+<p> <a href="/logout">Logout</a> </p>
+</body>
+</html>
