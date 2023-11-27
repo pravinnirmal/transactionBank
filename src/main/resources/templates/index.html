@@ -3,8 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <title>Bank: Home Page</title>
+    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.8.2/angular.min.js"></script>
 </head>
-<body>
+<body ng-app="bankApp">
 <H1> Pravin Bank</H1>
 <p><h3> Connected to Data base</h3></p>
 
@@ -12,5 +13,13 @@
 <p> Admin Dashboard : <a href=/admin/dashboard>Click </a></p>
 <p> <a href="/logout">Logout</a> </p>
 
+<script>
+    var app = angular.module('bankApp', []);
+
+    // Define a controller for your app
+    app.controller('bankController', function($scope) {
+        // Define controller logic here
+    });
+</script>
 </body>
 </html>

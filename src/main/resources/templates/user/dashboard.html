@@ -2,23 +2,49 @@
 <html lang="en" xmlns:th="http://www.w3.org/1999/html">
 <head>
     <meta charset="UTF-8">
+    <link href="https://unpkg.com/tailwindcss@^1.0/dist/tailwind.min.css" rel="stylesheet">
     <title>Dashboard</title>
 </head>
 <body>
-<H1 align="center"> Bank of Pravin </H1>
-<h2> Welcome <span th:text="*{username}"></span> </h2>
-<h3> Account Balance: ₹ <span th:text ="*{money}"> </span> </h3>
-<p>
- <a href="/user/dashboard/moneytransfer/sendmoney">Money Transfer</a>
-</p>
-<p>
-    <a href="/user/dashboard/statement">Statement</a>
-</p>
+<div
+        class="bg-neutral-100 p-12 text-center text-neutral-700 dark:bg-neutral-700 dark:text-neutral-200">
+    <h2 class="mb-4 text-4xl font-semibold">Bank of Pravin</h2>
+    <h4 class="mb-6 text-xl font-semibold">Welcome <span th:text="*{username}"></span></h4>
 
 
-<p> <a href="/logout">Logout</a> </p>
+</div>
 
 
+    <div class="container mx-auto flex flex-wrap p-5 flex-col md:flex-row items-center">
+        <a class="flex title-font font-medium items-center text-gray-900 mb-4 md:mb-0">
+<!--            <img src={locofy} />-->
+        </a>
+        <div class="md:ml-auto md:mr-auto flex flex-wrap items-center text-base justify-center">
+
+
+            <a class="mr-5 bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded" href="/user/dashboard/statement">View Statement</a>
+            <a class="mr-5 bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded" href="/user/dashboard/moneytransfer/sendmoney">Transfer Money</a>
+            <button id="toggleButton" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
+                View Account Balance
+            </button>
+            <span id="hiddenSpan" class="hidden bg-blue-500 text-white font-bold py-2 px-4 rounded" th:text="*{money}" ></span>
+        </div>
+        <button class="inline-flex items-center bg-yellow-500 border-0 py-1 px-3 mt-4 md:mt-0" ><a href="/logout">Log Out</a></button>
+    </div>
+
+
+
+<script>
+    // Get references to the button and the hidden span
+    const toggleButton = document.getElementById('toggleButton');
+    const hiddenSpan = document.getElementById('hiddenSpan');
+
+    // Add a click event listener to the button
+    toggleButton.addEventListener('click', function() {
+        // Toggle the 'hidden' class on the hidden span
+        hiddenSpan.classList.toggle('hidden');
+    });
+</script>
 
 
 </body>
