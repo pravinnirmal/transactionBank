@@ -1,9 +1,15 @@
 package pnd.pravin.bank.BankServices;
 
+import org.apache.catalina.security.SecurityConfig;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import pnd.pravin.bank.BankConstants.BankConstants;
 import pnd.pravin.bank.BankEntitites.PersonalAccountEntity;
 import pnd.pravin.bank.BankEntitites.SendMoneyEntity;
 import pnd.pravin.bank.BankEntitites.TransactionStatement;
@@ -36,26 +42,34 @@ public class SendMoneyService {
     @Value("${money.transfer.failed.transfer-success}")
     private String transferSuccess;
 
+    private static Logger logger = LoggerFactory.getLogger(SecurityConfig.class);
+
+    private Authentication authentication;
+
     public String sendMoneyToUser(SendMoneyEntity sendMoneyEntity, String transferee) {
 
-        //Check if username is present in DB
-        if (personalAccountRepository.findById(sendMoneyEntity.getUserName()).isPresent()) {
-            PersonalAccountEntity account = personalAccountRepository.findById(sendMoneyEntity.getUserName()).get();
-            String transfererName = account.getUsername();
-            Double transfererBalance = account.getMoney();
-            // Check if transferer name and transferee name are same
-            if (transferee.equals(transfererName)) {
-                return transferFailedSameUser;
-                // Check if transferer account balance is sufficient
-            } else if (transfererBalance < sendMoneyEntity.getMoney()) {
-                return transferFailedNoSufficientBalance;
+            //Check if username is present in DB
+            if (personalAccountRepository.findById(sendMoneyEntity.getUserName()).isPresent()) {
+                PersonalAccountEntity account = personalAccountRepository.findById(sendMoneyEntity.getUserName()).get();
+                String transfererName = account.getUsername();
+                Double transfererBalance = account.getMoney();
+                // Check if transferer name and transferee name are same
+                if (transferee.equals(transfererName)) {
+                    return transferFailedSameUser;
+                    // Check if transferer account balance is sufficient
+                } else if (transfererBalance < sendMoneyEntity.getMoney()) {
+                    logger.warn("User {} doesn't have sufficient balance to send money", sendMoneyEntity.getUserName());
+                    return transferFailedNoSufficientBalance;
+                } else {
+                    addMoneyToUser(sendMoneyEntity.getMoney(), sendMoneyEntity.getUserName(), transferee);
+                    logger.info("Transferred successfully to user {}", transferee);
+
+                }
             } else {
-                addMoneyToUser(sendMoneyEntity.getMoney(), sendMoneyEntity.getUserName(), transferee);
+                return transferFailedUserNotFound;
             }
-        } else {
-            return transferFailedUserNotFound;
-        }
-        return transferSuccess;
+            return transferSuccess;
+
     }
 
     private void addMoneyToUser(Double moneyToSend, String userName, String transferee) {
@@ -83,10 +97,10 @@ public class SendMoneyService {
 
         // Fetch the existing transaction statements for the user
         List<TransactionStatement> existingStatements = transactionStatementRepository.findByTransactionStatementEmbeddedIdUserName(userName);
-
         statementQueue.addAll(existingStatements);
 
         if (statementQueue.size() > 4) {
+            logger.info(BankConstants.REMOVE_OLD_STATEMENT);
             // Remove the oldest statement
             statementQueue.poll();
         }
@@ -96,6 +110,7 @@ public class SendMoneyService {
 
         // Update the database with the modified statements
         updateTransactionStatements(userName, statementQueue);
+        logger.info(BankConstants.UPDATED_TRANSACTION);
     }
 
     private TransactionStatement createNewTransactionStatement(String userName, Double moneySent, String transferedTo, Double balanceMoney) {

@@ -37,11 +37,12 @@ public class BankConfiguration {
 
     public SecurityFilterChain securityFilterChain (HttpSecurity httpSecurity) throws Exception {
         httpSecurity.csrf(Customizer.withDefaults())
-
+                .csrf(csrf -> csrf.ignoringRequestMatchers("/admin/**"))
                 .authorizeHttpRequests(authorize -> authorize
+                        .requestMatchers("/").hasAnyRole().anyRequest().permitAll()
                         .requestMatchers("/admin/**").hasRole("ADMIN")
                         .requestMatchers("/user/**").hasRole("USER")
-                        .requestMatchers("/").hasAnyRole())
+                        .anyRequest().authenticated())
                 .httpBasic(Customizer.withDefaults())
                 .formLogin(Customizer.withDefaults());
         return httpSecurity.build();
