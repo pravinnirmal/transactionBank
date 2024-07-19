@@ -32,8 +32,7 @@ public class BankController {
     TransactionStatementRepositoryService transactionStatementRepositoryService;
 
     Authentication authentication;
-    String loggedInUser;
-
+    private String loggedInUser;
 
     @GetMapping("/")
     public String homePage() {
@@ -48,7 +47,6 @@ public class BankController {
 
     @GetMapping("user/dashboard")
     public String viewUserDashboard(@ModelAttribute("PersonalAccountEntity") PersonalAccountEntity personalAccountEntity, Model model) {
-
         loggedInUser = authentication.getName();
         double money = bankService.getAccountDetails(loggedInUser);
 
@@ -81,7 +79,6 @@ public class BankController {
     @PostMapping("user/dashboard/moneytransfer/sendmoney")
     public String sendMoneyToUser(@ModelAttribute("SendMoney") SendMoneyEntity sendMoneyEntity, Model model, RedirectAttributes redirectAttributes) {
         model.addAttribute("SendMoney", new SendMoneyEntity());
-//        String transferee = authentication.getName();
         String transferStatus = sendMoneyService.sendMoneyToUser(sendMoneyEntity, loggedInUser );
         model.addAttribute("transferStatus", transferStatus);
         return  "user/dashboard/moneytransfer/transferstatus";

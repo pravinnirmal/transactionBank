@@ -44,8 +44,6 @@ public class SendMoneyService {
 
     private static Logger logger = LoggerFactory.getLogger(SecurityConfig.class);
 
-    private Authentication authentication;
-
     public String sendMoneyToUser(SendMoneyEntity sendMoneyEntity, String transferee) {
 
             //Check if username is present in DB
@@ -63,7 +61,6 @@ public class SendMoneyService {
                 } else {
                     addMoneyToUser(sendMoneyEntity.getMoney(), sendMoneyEntity.getUserName(), transferee);
                     logger.info("Transferred successfully to user {}", transferee);
-
                 }
             } else {
                 return transferFailedUserNotFound;
@@ -123,9 +120,7 @@ public class SendMoneyService {
         newTransactionStatement.setBalance(balanceMoney);
         newTransactionStatement.setTransferFrom(userName);
         newTransactionStatement.setTimestamp(Timestamp.from(Instant.now()));
-        newTransactionStatement.setCreditDebit("Debit");
-
-
+        newTransactionStatement.setCreditDebit(BankConstants.DEBIT);
         return newTransactionStatement;
     }
 
@@ -142,9 +137,7 @@ public class SendMoneyService {
         statement1.setBalance(moneySent + statement1.getBalance());
         statement1.setTransferFrom(transferedTo);
         statement1.setTimestamp(Timestamp.from(Instant.now()));
-        statement1.setCreditDebit("Credit");
-
-
+        statement1.setCreditDebit(BankConstants.CREDIT);
         transactionStatementRepository.save(statement1);
 
     }
@@ -152,7 +145,7 @@ public class SendMoneyService {
     private TransactionStatement saveToStatementRepo(String userName, Double moneySent, String transferedTo, TransactionStatement statement1) {
         statement1.setAmount(moneySent);
         statement1.setBalance(moneySent + statement1.getBalance());
-        statement1.setCreditDebit("Credit");
+        statement1.setCreditDebit(BankConstants.CREDIT);
         statement1.setTimestamp(Timestamp.from(Instant.now()));
         statement1.setTransferFrom(transferedTo);
         statement1.setTransactionStatementEmbeddedId(new TransactionStatementEmbeddedId(userName, generateTransactionId(userName)));

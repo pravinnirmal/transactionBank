@@ -12,9 +12,9 @@ public class BankConstants {
 
     public static final String UPDATED_TRANSACTION = "Transaction updated in database";
 
+    public static final String DEBIT = "Debit";
 
-
-
+    public static final String CREDIT = "Credit";
 
     public static final int ENABLED_ONE = 1;
 
