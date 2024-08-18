@@ -5,6 +5,10 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import lombok.extern.slf4j.Slf4j;
+import org.apache.catalina.security.SecurityConfig;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import pnd.pravin.bank.BankRepositories.PersonalAccountRepository;
@@ -14,11 +18,12 @@ import pnd.pravin.bank.BankRepositories.PersonalAccountRepository;
 @Getter
 @Setter
 @Service
+@Slf4j
 public class SendMoneyEntity {
     private String userName;
     private Double money;
 
-
+    @Autowired
     PersonalAccountRepository personalAccountRepository;
 
     @Autowired
@@ -27,15 +32,16 @@ public class SendMoneyEntity {
     }
 
     public SendMoneyEntity(String formData, Double moneyData) {
+        this.userName = formData;
+        this.money = moneyData;
     }
-
 
     @PostConstruct
     public void init() {
         if (personalAccountRepository != null) {
-            System.out.println("personalAccountRepository is not null");
+           log.info("Personal Account Repository is not null");
         } else {
-            System.out.println("personalAccountRepository is null");
+            log.warn("Personal Account Repository is null");
         }
     }
 

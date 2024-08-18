@@ -25,7 +25,7 @@ import java.util.*;
 public class SendMoneyService {
 
     @Autowired
-    private PersonalAccountRepository personalAccountRepository;
+    private final PersonalAccountRepository personalAccountRepository;
 
     @Autowired
     private TransactionStatementRepository transactionStatementRepository;
@@ -43,6 +43,12 @@ public class SendMoneyService {
     private String transferSuccess;
 
     private static Logger logger = LoggerFactory.getLogger(SecurityConfig.class);
+
+    public SendMoneyService(PersonalAccountRepository personalAccountRepository, TransactionStatementRepository transactionStatementRepository) {
+        super();
+        this.personalAccountRepository = personalAccountRepository;
+        this.transactionStatementRepository = transactionStatementRepository;
+    }
 
     public String sendMoneyToUser(SendMoneyEntity sendMoneyEntity, String transferee) {
 
